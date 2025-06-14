@@ -4,24 +4,32 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { ArrowDown, Copy } from "lucide-react";
+import { Copy, RefreshCcw } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const Index = () => {
-  const [mode, setMode] = useState<"encode" | "decode">("encode");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
 
-  const handleProcess = () => {
+  const handleEncode = () => {
     if (!input) return;
     try {
-      const result =
-        mode === "encode"
-          ? encodeURIComponent(input)
-          : decodeURIComponent(input);
+      const result = encodeURIComponent(input);
       setOutput(result);
     } catch (error) {
-      console.error(`${mode} error:`, error);
-      toast.error(`Could not ${mode} the provided text. It may be invalid.`);
+      console.error("encode error:", error);
+      toast.error("Could not encode the provided text. It may be invalid.");
+    }
+  };
+  
+  const handleDecode = () => {
+    if (!input) return;
+    try {
+      const result = decodeURIComponent(input);
+      setOutput(result);
+    } catch (error) {
+      console.error("decode error:", error);
+      toast.error("Could not decode the provided text. It may be invalid.");
     }
   };
 
@@ -40,77 +48,54 @@ const Index = () => {
       }
     );
   };
-
-  const handleModeChange = (newMode: "encode" | "decode") => {
-    if (newMode && newMode !== mode) {
-      setMode(newMode);
-      setInput(output);
-      setOutput("");
-    }
+  
+  const handleSwap = () => {
+    setInput(output);
+    setOutput(input);
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 font-sans">
-      <div className="w-full max-w-3xl flex flex-col items-center gap-8">
+      <div className="w-full max-w-2xl flex flex-col items-center gap-6">
         <div className="text-center">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
-            URL Encoder / Decoder
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+            Encoder Decoder
           </h1>
           <p className="text-muted-foreground mt-2">
             A simple tool to encode or decode URI components.
           </p>
         </div>
 
-        <div className="flex justify-center items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => handleModeChange("encode")}
-            className={`text-lg transition-all rounded-md px-4 py-1 ${
-              mode === "encode"
-                ? "text-primary border-b-2 border-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Encode
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => handleModeChange("decode")}
-            className={`text-lg transition-all rounded-md px-4 py-1 ${
-              mode === "decode"
-                ? "text-primary border-b-2 border-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Decode
-          </Button>
-        </div>
+        <ToggleGroup type="single" defaultValue="url" variant="outline" className="gap-2 flex-wrap justify-center">
+          <ToggleGroupItem value="url" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">URL</ToggleGroupItem>
+          <ToggleGroupItem value="base64" disabled>Base64</ToggleGroupItem>
+          <ToggleGroupItem value="base32" disabled>Base32</ToggleGroupItem>
+          <ToggleGroupItem value="base58" disabled>Base58</ToggleGroupItem>
+          <ToggleGroupItem value="html" disabled>HTML</ToggleGroupItem>
+        </ToggleGroup>
 
-        <div className="w-full space-y-6">
+        <div className="w-full space-y-4">
           <div className="grid w-full gap-2">
-            <Label htmlFor="input-text" className="capitalize">
-              {mode} Input
-            </Label>
+            <Label htmlFor="input-text">Input</Label>
             <Textarea
               id="input-text"
-              placeholder={`Paste your text to ${mode} here...`}
+              placeholder="Paste your text here..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              rows={8}
-              className="resize-none font-mono bg-transparent border-border/50 focus:border-primary"
+              rows={6}
+              className="resize-none font-mono bg-background"
             />
           </div>
 
-          <div className="flex items-center justify-center">
-            <Button
-              onClick={handleProcess}
-              disabled={!input}
-              variant="outline"
-              size="lg"
-              className="w-full max-w-xs border-2 border-primary text-primary font-bold hover:bg-primary hover:text-primary-foreground transition-all"
-            >
-              <ArrowDown className="mr-2 h-4 w-4" />
-              {mode === "encode" ? "Encode" : "Decode"} Text
+          <div className="w-full flex justify-start items-center gap-2 flex-wrap">
+            <Button onClick={handleEncode} disabled={!input} variant="outline">Encode</Button>
+            <Button onClick={handleDecode} disabled={!input} variant="outline">Decode</Button>
+            <div className="flex-grow" />
+            <Button onClick={handleSwap} variant="ghost" size="icon" aria-label="Swap input and output" disabled={!input && !output}>
+              <RefreshCcw className="h-4 w-4" />
+            </Button>
+            <Button onClick={handleCopy} variant="ghost" size="icon" aria-label="Copy to clipboard" disabled={!output}>
+              <Copy className="h-4 w-4" />
             </Button>
           </div>
 
@@ -121,24 +106,14 @@ const Index = () => {
               readOnly
               value={output}
               placeholder="Your result will appear here..."
-              rows={8}
-              className="resize-none font-mono pr-12 bg-transparent border-border/50"
+              rows={6}
+              className="resize-none font-mono bg-background"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-9 right-2 h-8 w-8 text-muted-foreground hover:text-primary"
-              onClick={handleCopy}
-              disabled={!output}
-              aria-label="Copy to clipboard"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
           </div>
         </div>
         
-        <div className="text-center text-sm text-muted-foreground pt-8">
-            <p>Powered by native browser APIs</p>
+        <div className="text-center text-sm text-muted-foreground pt-4">
+            <p>The tool uses UTF-8 charset.</p>
         </div>
       </div>
     </div>
