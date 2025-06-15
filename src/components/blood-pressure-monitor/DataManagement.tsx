@@ -2,9 +2,10 @@
 import * as React from 'react';
 import { Reading } from './types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, Download } from 'lucide-react';
+import { Upload, Download, ShieldCheck } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface DataManagementProps {
   readings: Reading[];
@@ -129,7 +130,7 @@ export const DataManagement = ({ readings, onImport }: DataManagementProps) => {
           Export your readings or import from a file.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <CardContent className="flex flex-col gap-4">
         <Button onClick={handleExportJSON} variant="outline">
           <Upload className="mr-2 h-4 w-4" /> Export JSON
         </Button>
@@ -147,6 +148,14 @@ export const DataManagement = ({ readings, onImport }: DataManagementProps) => {
           accept=".json,.csv"
         />
       </CardContent>
+      <CardFooter>
+        <Alert>
+          <ShieldCheck className="h-4 w-4" />
+          <AlertDescription>
+            This data stays on your device and never on the application server.
+          </AlertDescription>
+        </Alert>
+      </CardFooter>
     </Card>
   );
 };
