@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -120,8 +119,6 @@ const EncoderDecoder = () => {
         >
           <ToggleGroupItem value="url" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">URL</ToggleGroupItem>
           <ToggleGroupItem value="base64" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Base64</ToggleGroupItem>
-          <ToggleGroupItem value="base32" disabled>Base32</ToggleGroupItem>
-          <ToggleGroupItem value="base58" disabled>Base58</ToggleGroupItem>
           <ToggleGroupItem value="html" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">HTML</ToggleGroupItem>
         </ToggleGroup>
 
