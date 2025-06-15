@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { useState, useEffect } from "react";
 import * as z from "zod";
@@ -6,6 +5,7 @@ import { Reading, formSchema } from "@/components/blood-pressure-monitor/types";
 import { NewReadingForm } from "@/components/blood-pressure-monitor/NewReadingForm";
 import { ReadingsCalendar } from "@/components/blood-pressure-monitor/ReadingsCalendar";
 import { ReadingsDisplay } from "@/components/blood-pressure-monitor/ReadingsDisplay";
+import { DataManagement } from "@/components/blood-pressure-monitor/DataManagement";
 import { DateRange } from "react-day-picker";
 import { subDays } from "date-fns";
 
@@ -50,12 +50,18 @@ const BloodPressureMonitor = () => {
     }
   }
 
+  function handleImportReadings(newReadings: Reading[]) {
+    // For now, we will replace the current readings with the imported ones.
+    setReadings(newReadings);
+  }
+
   return (
     <div className="container mx-auto p-4 md:p-8">
       <h1 className="text-3xl font-bold mb-6">Blood Pressure Monitor</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1 space-y-8">
           <NewReadingForm selectedDate={selectedDate} onAddReading={handleAddReading} />
+          <DataManagement readings={readings} onImport={handleImportReadings} />
         </div>
         <div className="lg:col-span-2 space-y-8">
           <ReadingsCalendar readings={readings} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
