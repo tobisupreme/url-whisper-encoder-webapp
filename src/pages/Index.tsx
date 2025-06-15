@@ -33,9 +33,9 @@ const Index = () => {
           A collection of simple tools to help you with various tasks.
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
         {tools.map((tool) => (
-          <Link to={tool.href} key={tool.title} className="block group">
+          <Link to={tool.href} key={tool.title} className="block group w-11/12 md:w-full">
             <Card className="h-full border-2 border-transparent group-hover:border-primary transition-all duration-300">
               <CardHeader className="flex flex-row items-center gap-4 pb-2">
                 {tool.icon}
