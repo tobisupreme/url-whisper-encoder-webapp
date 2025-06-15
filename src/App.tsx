@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import EncoderDecoder from "./pages/tools/EncoderDecoder";
 import KaraokeFinder from "./pages/tools/KaraokeFinder";
+import BloodPressureMonitor from "./pages/tools/BloodPressureMonitor";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/tools/encoder-decoder" element={<EncoderDecoder />} />
             <Route path="/tools/karaoke-finder" element={<KaraokeFinder />} />
+            <Route path="/tools/blood-pressure-monitor" element={<BloodPressureMonitor />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

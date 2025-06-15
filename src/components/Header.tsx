@@ -33,6 +33,9 @@ const Header = () => {
                   <ListItem to="/tools/karaoke-finder" title="Karaoke Finder">
                     Find karaoke versions of songs on YouTube.
                   </ListItem>
+                  <ListItem to="/tools/blood-pressure-monitor" title="Blood Pressure Monitor">
+                    Track your blood pressure readings over time.
+                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
