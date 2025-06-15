@@ -30,6 +30,9 @@ const Header = () => {
                   <ListItem to="/tools/encoder-decoder" title="Encoder/Decoder">
                     Encode and decode strings using various algorithms.
                   </ListItem>
+                  <ListItem to="/tools/karaoke-finder" title="Karaoke Finder">
+                    Find karaoke versions of songs on YouTube.
+                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>

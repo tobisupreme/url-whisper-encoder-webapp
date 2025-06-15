@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import EncoderDecoder from "./pages/tools/EncoderDecoder";
+import KaraokeFinder from "./pages/tools/KaraokeFinder";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tools/encoder-decoder" element={<EncoderDecoder />} />
+            <Route path="/tools/karaoke-finder" element={<KaraokeFinder />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
