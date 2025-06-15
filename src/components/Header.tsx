@@ -10,7 +10,7 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import { Tools } from "lucide-react";
+import { Wrench } from "lucide-react";
 
 const Header = () => {
   return (
@@ -23,7 +23,7 @@ const Header = () => {
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger>
-                <Tools className="h-4 w-4 mr-2" /> Tools
+                <Wrench className="h-4 w-4 mr-2" /> Tools
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 w-[250px]">
