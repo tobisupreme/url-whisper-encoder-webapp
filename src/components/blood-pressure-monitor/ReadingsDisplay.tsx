@@ -22,6 +22,15 @@ import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { Reading } from "./types";
 import { DateRangePicker } from "./DateRangePicker";
 import { DateRange } from "react-day-picker";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Maximize } from "lucide-react";
 
 const chartConfig = {
   systolic: {
@@ -118,7 +127,52 @@ export const ReadingsDisplay = ({ readings, selectedDate, dateRange, onDateRange
                 <CardTitle>Blood Pressure Trend</CardTitle>
                 <CardDescription>A chart showing your readings over time.</CardDescription>
               </div>
-              <DateRangePicker dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
+              <div className="flex items-center gap-2">
+                <DateRangePicker dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="icon" className="shrink-0">
+                      <Maximize className="h-4 w-4" />
+                      <span className="sr-only">View in full screen</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-4xl h-[80vh] flex flex-col">
+                    <DialogHeader>
+                      <DialogTitle>Blood Pressure Trend</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-grow">
+                      {chartData.length > 0 ? (
+                        <ChartContainer config={chartConfig} className="h-full w-full">
+                          <LineChart
+                            accessibilityLayer
+                            data={chartData}
+                            margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
+                          >
+                            <CartesianGrid vertical={false} />
+                            <XAxis
+                              dataKey="date"
+                              tickLine={false}
+                              axisLine={false}
+                              tickMargin={8}
+                              tickFormatter={(value) => value.split(',')[0]}
+                              interval="preserveStartEnd"
+                            />
+                            <YAxis domain={['dataMin - 10', 'dataMax + 10']} />
+                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                            <ChartLegend content={<ChartLegendContent />} />
+                            <Line dataKey="systolic" type="monotone" stroke="var(--color-systolic)" strokeWidth={2} dot={true} />
+                            <Line dataKey="diastolic" type="monotone" stroke="var(--color-diastolic)" strokeWidth={2} dot={true} />
+                          </LineChart>
+                        </ChartContainer>
+                      ) : (
+                        <div className="flex h-full items-center justify-center">
+                          <p className="text-muted-foreground">No readings found for the selected date range.</p>
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
               {chartData.length > 0 ? (
