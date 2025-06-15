@@ -1,6 +1,5 @@
-
 import * as React from "react";
-import { isSameDay, format } from "date-fns";
+import { isSameDay, format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
@@ -21,6 +20,8 @@ import {
 } from "@/components/ui/chart";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { Reading } from "./types";
+import { DateRangePicker } from "./DateRangePicker";
+import { DateRange } from "react-day-picker";
 
 const chartConfig = {
   systolic: {
@@ -36,22 +37,34 @@ const chartConfig = {
 interface ReadingsDisplayProps {
   readings: Reading[];
   selectedDate: Date | undefined;
+  dateRange: DateRange | undefined;
+  onDateRangeChange: (date: DateRange | undefined) => void;
 }
 
-export const ReadingsDisplay = ({ readings, selectedDate }: ReadingsDisplayProps) => {
+export const ReadingsDisplay = ({ readings, selectedDate, dateRange, onDateRangeChange }: ReadingsDisplayProps) => {
   const selectedDayReadings = readings
     .filter((reading) => selectedDate && isSameDay(reading.date, selectedDate))
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   const chartData = React.useMemo(() => {
-    return readings
+    const filteredReadings =
+      dateRange?.from
+        ? readings.filter((reading) =>
+            isWithinInterval(reading.date, {
+              start: startOfDay(dateRange.from!),
+              end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from!),
+            })
+          )
+        : readings;
+        
+    return filteredReadings
       .sort((a, b) => a.date.getTime() - b.date.getTime())
       .map((r) => ({
         date: format(r.date, "MMM d, h:mm a"),
         systolic: r.systolic,
         diastolic: r.diastolic,
       }));
-  }, [readings]);
+  }, [readings, dateRange]);
 
   return (
     <Tabs defaultValue="list" className="w-full">
@@ -100,32 +113,41 @@ export const ReadingsDisplay = ({ readings, selectedDate }: ReadingsDisplayProps
       <TabsContent value="chart">
         {readings.length > 0 ? (
           <Card>
-            <CardHeader>
-              <CardTitle>Blood Pressure Trend</CardTitle>
-              <CardDescription>A chart showing your readings over time.</CardDescription>
+            <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <CardTitle>Blood Pressure Trend</CardTitle>
+                <CardDescription>A chart showing your readings over time.</CardDescription>
+              </div>
+              <DateRangePicker dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                <LineChart
-                  accessibilityLayer
-                  data={chartData}
-                  margin={{ top: 20, right: 20, left: 10, bottom: 0 }}
-                >
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="date"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    tickFormatter={(value) => value.slice(0, 6)}
-                  />
-                  <YAxis domain={['dataMin - 10', 'dataMax + 10']} />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  <Line dataKey="systolic" type="monotone" stroke="var(--color-systolic)" strokeWidth={2} dot={true} />
-                  <Line dataKey="diastolic" type="monotone" stroke="var(--color-diastolic)" strokeWidth={2} dot={true} />
-                </LineChart>
-              </ChartContainer>
+              {chartData.length > 0 ? (
+                <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                  <LineChart
+                    accessibilityLayer
+                    data={chartData}
+                    margin={{ top: 20, right: 20, left: 10, bottom: 0 }}
+                  >
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      tickFormatter={(value) => value.slice(0, 6)}
+                    />
+                    <YAxis domain={['dataMin - 10', 'dataMax + 10']} />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Line dataKey="systolic" type="monotone" stroke="var(--color-systolic)" strokeWidth={2} dot={true} />
+                    <Line dataKey="diastolic" type="monotone" stroke="var(--color-diastolic)" strokeWidth={2} dot={true} />
+                  </LineChart>
+                </ChartContainer>
+              ) : (
+                <div className="flex h-[300px] items-center justify-center">
+                  <p className="text-muted-foreground">No readings found for the selected date range.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         ) : (

@@ -6,6 +6,8 @@ import { Reading, formSchema } from "@/components/blood-pressure-monitor/types";
 import { NewReadingForm } from "@/components/blood-pressure-monitor/NewReadingForm";
 import { ReadingsCalendar } from "@/components/blood-pressure-monitor/ReadingsCalendar";
 import { ReadingsDisplay } from "@/components/blood-pressure-monitor/ReadingsDisplay";
+import { DateRange } from "react-day-picker";
+import { subDays } from "date-fns";
 
 const BloodPressureMonitor = () => {
   const [readings, setReadings] = useState<Reading[]>(() => {
@@ -25,6 +27,10 @@ const BloodPressureMonitor = () => {
     return [];
   });
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 29),
+    to: new Date(),
+  });
 
   useEffect(() => {
     try {
@@ -53,7 +59,12 @@ const BloodPressureMonitor = () => {
         </div>
         <div className="lg:col-span-2 space-y-8">
           <ReadingsCalendar readings={readings} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
-          <ReadingsDisplay readings={readings} selectedDate={selectedDate} />
+          <ReadingsDisplay
+            readings={readings}
+            selectedDate={selectedDate}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+          />
         </div>
       </div>
     </div>
