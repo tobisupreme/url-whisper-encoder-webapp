@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { format } from "date-fns";
+import { format, subDays, subMonths, subYears } from "date-fns";
 import { CalendarRange } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
@@ -23,9 +23,23 @@ export function DateRangePicker({
   dateRange,
   onDateRangeChange,
 }: DateRangePickerProps) {
+  const [open, setOpen] = React.useState(false);
+
+  const handlePresetClick = (from: Date) => {
+    onDateRangeChange({ from, to: new Date() });
+    setOpen(false);
+  };
+
+  const handleSelect = (range: DateRange | undefined) => {
+    onDateRangeChange(range);
+    if (range?.from && range?.to) {
+      setOpen(false);
+    }
+  }
+
   return (
     <div className={cn("grid gap-2", className)}>
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             id="date"
@@ -50,13 +64,21 @@ export function DateRangePicker({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0 flex" align="start">
+          <div className="flex flex-col gap-1 border-r p-2">
+            <Button variant="ghost" className="justify-start px-2" onClick={() => handlePresetClick(subDays(new Date(), 6))}>Last 7 days</Button>
+            <Button variant="ghost" className="justify-start px-2" onClick={() => handlePresetClick(subDays(new Date(), 20))}>Last 3 weeks</Button>
+            <Button variant="ghost" className="justify-start px-2" onClick={() => handlePresetClick(subMonths(new Date(), 1))}>Last month</Button>
+            <Button variant="ghost" className="justify-start px-2" onClick={() => handlePresetClick(subMonths(new Date(), 3))}>Last 3 months</Button>
+            <Button variant="ghost" className="justify-start px-2" onClick={() => handlePresetClick(subMonths(new Date(), 6))}>Last 6 months</Button>
+            <Button variant="ghost" className="justify-start px-2" onClick={() => handlePresetClick(subYears(new Date(), 1))}>Last year</Button>
+          </div>
           <Calendar
             initialFocus
             mode="range"
             defaultMonth={dateRange?.from}
             selected={dateRange}
-            onSelect={onDateRangeChange}
+            onSelect={handleSelect}
             numberOfMonths={2}
             disabled={(date) => date > new Date()}
           />
