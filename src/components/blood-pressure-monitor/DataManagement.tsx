@@ -3,8 +3,8 @@ import * as React from 'react';
 import { Reading } from './types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { toast } from '@/components/ui/use-toast';
-import { Export, Import } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Upload, Download } from 'lucide-react';
 
 interface DataManagementProps {
   readings: Reading[];
@@ -13,6 +13,7 @@ interface DataManagementProps {
 
 export const DataManagement = ({ readings, onImport }: DataManagementProps) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleExportJSON = () => {
     if (readings.length === 0) {
@@ -130,13 +131,13 @@ export const DataManagement = ({ readings, onImport }: DataManagementProps) => {
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Button onClick={handleExportJSON} variant="outline">
-          <Export className="mr-2 h-4 w-4" /> Export JSON
+          <Upload className="mr-2 h-4 w-4" /> Export JSON
         </Button>
         <Button onClick={handleExportCSV} variant="outline">
-          <Export className="mr-2 h-4 w-4" /> Export CSV
+          <Upload className="mr-2 h-4 w-4" /> Export CSV
         </Button>
         <Button onClick={handleImportClick}>
-          <Import className="mr-2 h-4 w-4" /> Import from File
+          <Download className="mr-2 h-4 w-4" /> Import from File
         </Button>
         <input
           type="file"
