@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { Reading } from './types';
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,12 @@ interface DataManagementProps {
 export const DataManagement = ({ readings, onImport }: DataManagementProps) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const sampleReadings = [
+    { systolic: 120, diastolic: 80, date: new Date('2025-06-13T10:00:00.000Z') },
+    { systolic: 125, diastolic: 82, date: new Date('2025-06-14T10:05:00.000Z') },
+    { systolic: 118, diastolic: 78, date: new Date('2025-06-15T10:10:00.000Z') },
+  ];
 
   const handleExportJSON = () => {
     if (readings.length === 0) {
@@ -50,6 +55,34 @@ export const DataManagement = ({ readings, onImport }: DataManagementProps) => {
     link.download = `blood-pressure-readings-${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     toast({ title: 'Success!', description: 'Data exported as CSV.' });
+  };
+
+  const handleDownloadSampleJSON = () => {
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+      JSON.stringify(sampleReadings.map(r => ({...r, date: r.date.toISOString()})), null, 2)
+    )}`;
+    const link = document.createElement('a');
+    link.href = jsonString;
+    link.download = `sample-blood-pressure-readings.json`;
+    link.click();
+    toast({ title: 'Success!', description: 'Sample JSON file downloaded.' });
+  };
+
+  const handleDownloadSampleCSV = () => {
+    const header = 'date,systolic,diastolic\n';
+    const csvRows = sampleReadings
+      .map((r) => `${r.date.toISOString()},${r.systolic},${r.diastolic}`)
+      .join('\n');
+    
+    const csvString = `data:text/csv;charset=utf-8,${encodeURIComponent(
+      header + csvRows
+    )}`;
+    
+    const link = document.createElement('a');
+    link.href = csvString;
+    link.download = `sample-blood-pressure-readings.csv`;
+    link.click();
+    toast({ title: 'Success!', description: 'Sample CSV file downloaded.' });
   };
 
   const handleImportClick = () => {
@@ -147,6 +180,19 @@ export const DataManagement = ({ readings, onImport }: DataManagementProps) => {
           className="hidden"
           accept=".json,.csv"
         />
+        <div className="border-t pt-4">
+          <p className="text-sm text-muted-foreground mb-2">
+            Download a sample file to see the required format.
+          </p>
+          <div className="flex gap-2">
+            <Button onClick={handleDownloadSampleJSON} variant="secondary" size="sm">
+              Sample JSON
+            </Button>
+            <Button onClick={handleDownloadSampleCSV} variant="secondary" size="sm">
+              Sample CSV
+            </Button>
+          </div>
+        </div>
       </CardContent>
       <CardFooter>
         <Alert>
