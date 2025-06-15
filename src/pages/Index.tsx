@@ -10,11 +10,31 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 const Index = () => {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
+  const [encodingType, setEncodingType] = useState("url");
 
   const handleEncode = () => {
     if (!input) return;
     try {
-      const result = encodeURIComponent(input);
+      let result = "";
+      switch (encodingType) {
+        case "url":
+          result = encodeURIComponent(input);
+          break;
+        case "base64":
+          // Modern way to handle UTF-8 strings in btoa
+          result = btoa(
+            encodeURIComponent(input).replace(/%([0-9A-F]{2})/g, (match, p1) =>
+              String.fromCharCode(parseInt(p1, 16))
+            )
+          );
+          break;
+        case "html": {
+          const textarea = document.createElement("textarea");
+          textarea.textContent = input;
+          result = textarea.innerHTML;
+          break;
+        }
+      }
       setOutput(result);
     } catch (error) {
       console.error("encode error:", error);
@@ -25,7 +45,27 @@ const Index = () => {
   const handleDecode = () => {
     if (!input) return;
     try {
-      const result = decodeURIComponent(input);
+      let result = "";
+      switch (encodingType) {
+        case "url":
+          result = decodeURIComponent(input);
+          break;
+        case "base64":
+          // Modern way to handle UTF-8 strings in atob
+          result = decodeURIComponent(
+            atob(input)
+              .split("")
+              .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+              .join("")
+          );
+          break;
+        case "html": {
+          const textarea = document.createElement("textarea");
+          textarea.innerHTML = input;
+          result = textarea.value;
+          break;
+        }
+      }
       setOutput(result);
     } catch (error) {
       console.error("decode error:", error);
@@ -66,12 +106,23 @@ const Index = () => {
           </p>
         </div>
 
-        <ToggleGroup type="single" defaultValue="url" variant="outline" className="gap-2 flex-wrap justify-center">
+        <ToggleGroup
+          type="single"
+          value={encodingType}
+          onValueChange={(value) => {
+            if (value) {
+              setEncodingType(value);
+              setOutput("");
+            }
+          }}
+          variant="outline"
+          className="gap-2 flex-wrap justify-center"
+        >
           <ToggleGroupItem value="url" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">URL</ToggleGroupItem>
-          <ToggleGroupItem value="base64" disabled>Base64</ToggleGroupItem>
+          <ToggleGroupItem value="base64" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Base64</ToggleGroupItem>
           <ToggleGroupItem value="base32" disabled>Base32</ToggleGroupItem>
           <ToggleGroupItem value="base58" disabled>Base58</ToggleGroupItem>
-          <ToggleGroupItem value="html" disabled>HTML</ToggleGroupItem>
+          <ToggleGroupItem value="html" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">HTML</ToggleGroupItem>
         </ToggleGroup>
 
         <div className="w-full space-y-4">
