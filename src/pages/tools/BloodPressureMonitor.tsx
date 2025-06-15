@@ -1,5 +1,6 @@
+
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -58,8 +59,31 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const BloodPressureMonitor = () => {
-  const [readings, setReadings] = useState<Reading[]>([]);
+  const [readings, setReadings] = useState<Reading[]>(() => {
+    try {
+      const item = window.localStorage.getItem("bloodPressureReadings");
+      if (item) {
+        const parsed = JSON.parse(item);
+        // Dates are stored as strings in JSON, so we need to convert them back to Date objects
+        return parsed.map((r: Reading) => ({
+          ...r,
+          date: new Date(r.date),
+        }));
+      }
+    } catch (error) {
+      console.error("Error reading from localStorage", error);
+    }
+    return [];
+  });
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("bloodPressureReadings", JSON.stringify(readings));
+    } catch (error) {
+      console.error("Error writing to localStorage", error);
+    }
+  }, [readings]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
